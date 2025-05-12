@@ -7,6 +7,7 @@ import {
 import { useAuth } from "./hooks/useAuth";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
+import Layout from "./components/Layout";
 import "./App.css";
 
 // Protected route wrapper
@@ -27,49 +28,33 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50">
-        <nav className="bg-white shadow-sm border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between h-16">
-              <div className="flex">
-                <div className="flex-shrink-0 flex items-center">
-                  <h1 className="text-xl font-bold text-blue-600">
-                    Documentation App
-                  </h1>
-                </div>
-              </div>
-            </div>
-          </div>
-        </nav>
+      <Layout>
+        <Routes>
+          {/* Public routes */}
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
 
-        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          <Routes>
-            {/* Public routes */}
-            <Route path="/signin" element={<SignIn />} />
-            <Route path="/signup" element={<SignUp />} />
+          {/* Protected routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <div>Dashboard (Protected)</div>
+              </ProtectedRoute>
+            }
+          />
 
-            {/* Protected routes */}
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <div>Dashboard (Protected)</div>
-                </ProtectedRoute>
-              }
-            />
-
-            {/* Redirect root to dashboard if authenticated, otherwise to signin */}
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <Navigate to="/dashboard" />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </main>
-      </div>
+          {/* Redirect root to dashboard if authenticated, otherwise to signin */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Navigate to="/dashboard" />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Layout>
     </Router>
   );
 }

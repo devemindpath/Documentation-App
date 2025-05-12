@@ -44,8 +44,8 @@ export default function SignUp() {
 
   if (emailSent) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-md">
+      <div className="flex min-h-screen items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-md space-y-8">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
             <h2 className="text-center text-2xl font-bold text-gray-900 mb-4">
               Check your email
@@ -73,13 +73,13 @@ export default function SignUp() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-          <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-            <div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Create your account
-        </h2>
-            </div>
+    <div className="flex min-h-screen items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Create your account
+          </h2>
+        </div>
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
@@ -167,15 +167,14 @@ export default function SignUp() {
                 {loading ? 'Signing up...' : 'Sign up'}
               </button>
             </div>
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
-       
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Or{' '}
-          <Link to="/signin" className="font-medium text-indigo-600 hover:text-indigo-500">
-            sign in to your existing account
-          </Link>
-        </p>
-      </div>
+            <div className="text-center">
+              <p className="mt-2 text-sm text-gray-600">
+                Or{' '}
+                <Link to="/signin" className="font-medium text-indigo-600 hover:text-indigo-500">
+                  sign in to your existing account
+                </Link>
+              </p>
+            </div>
           </form>
         </div>
       </div>
