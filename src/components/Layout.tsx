@@ -14,14 +14,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
     if (isAuthPage) {
         return (
-            <div className="min-h-screen bg-gray-50">
+            <div className="h-screen bg-gray-50">
                 {children}
             </div>
         );
     }
 
     return (
-        <div className="flex flex-col min-h-screen bg-gray-50">
+        <div className="flex flex-col h-screen bg-gray-50">
             {user && <Header />}
             <main className="flex-1">
                 {children}
