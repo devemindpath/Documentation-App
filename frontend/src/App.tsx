@@ -11,6 +11,7 @@ import Layout from "./components/Layout";
 import "./App.css";
 import Dashboard from "./pages/Dashboard";
 import AIAssistant from "./pages/AIAssistant";
+import MarkdownDemo from "./pages/MarkdownDemo";
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -37,20 +38,28 @@ export default function App() {
           <Route path="/signup" element={<SignUp />} />
           {/* Protected routes */}
           <Route
-              path="/dashboard"
-              element={
-                  <ProtectedRoute>
-                      <Dashboard />
-                  </ProtectedRoute>
-              }
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
           />
           <Route
-              path="/ai-assistant"
-              element={
-                  <ProtectedRoute>
-                      <AIAssistant />
-                  </ProtectedRoute>
-              }
+            path="/ai-assistant"
+            element={
+              <ProtectedRoute>
+                <AIAssistant />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/markdown-demo"
+            element={
+              <ProtectedRoute>
+                <MarkdownDemo />
+              </ProtectedRoute>
+            }
           />
           {/* Redirect root to dashboard if authenticated, otherwise to signin */}
           <Route
