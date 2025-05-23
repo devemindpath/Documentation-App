@@ -25,6 +25,7 @@ const AIAssistant: React.FC = () => {
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -57,29 +58,37 @@ const AIAssistant: React.FC = () => {
   }, []);
 
   // Handle file selection
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
 
-    const newSelectedImages: string[] = [];
-
+    const formData = new FormData();
     Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          newSelectedImages.push(e.target.result as string);
-          if (newSelectedImages.length === files.length) {
-            setSelectedImages((prev) => [...prev, ...newSelectedImages]);
-          }
-        }
-      };
-      reader.readAsDataURL(file);
+      formData.append('images', file);
     });
+
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setUploadedImageUrls(data.urls);
+        setSelectedImages(data.urls);
+      } else {
+        console.error('Upload failed:', data.error);
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+    }
   };
 
   // Handle removing an image from the selected images
   const handleRemoveImage = (index: number) => {
     setSelectedImages((prev) => prev.filter((_, i) => i !== index));
+    setUploadedImageUrls((prev) => prev.filter((_, i) => i !== index));
   };
 
   // Trigger file input click
@@ -90,12 +99,13 @@ const AIAssistant: React.FC = () => {
   // Clear selected images
   const clearSelectedImages = () => {
     setSelectedImages([]);
+    setUploadedImageUrls([]);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim() && selectedImages.length === 0) return;
 
@@ -112,72 +122,73 @@ const AIAssistant: React.FC = () => {
     setMessage("");
     clearSelectedImages();
 
-    // Simulate assistant typing
+    // Start typing indicator
     setIsTyping(true);
 
-    // Simulate assistant response after delay
-    setTimeout(() => {
-      let responseText = message.trim()
-        ? `I received your message about "${message}".`
-        : "I received your images.";
+    try {
+      // Prepare query parameters
+      const params = new URLSearchParams({
+        message: message,
+        images: JSON.stringify(uploadedImageUrls),
+        history: JSON.stringify(messages),
+      });
 
-      responseText += " How can I help you with this rental listing?";
+      // Create EventSource for streaming
+      const eventSource = new EventSource(`/api/chat?${params.toString()}`);
+      let assistantResponse = "";
 
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: responseText,
-        sender: "assistant",
-        timestamp: new Date(),
+      eventSource.onmessage = (event) => {
+        if (event.data === "[DONE]") {
+          eventSource.close();
+          setIsTyping(false);
+          return;
+        }
+
+        try {
+          const data = JSON.parse(event.data);
+          if (data.error) {
+            console.error('Chat error:', data.error);
+            eventSource.close();
+            setIsTyping(false);
+            return;
+          }
+
+          if (data.content) {
+            assistantResponse += data.content;
+            setMessages((prev) => {
+              const lastMessage = prev[prev.length - 1];
+              if (lastMessage.sender === "assistant") {
+                return [
+                  ...prev.slice(0, -1),
+                  { ...lastMessage, text: assistantResponse },
+                ];
+              } else {
+                return [
+                  ...prev,
+                  {
+                    id: Date.now().toString(),
+                    text: assistantResponse,
+                    sender: "assistant",
+                    timestamp: new Date(),
+                  },
+                ];
+              }
+            });
+          }
+        } catch (error) {
+          console.error('Error parsing SSE data:', error);
+        }
       };
 
-      setMessages((prev) => [...prev, assistantMessage]);
+      eventSource.onerror = (error) => {
+        console.error('SSE error:', error);
+        eventSource.close();
+        setIsTyping(false);
+      };
+    } catch (error) {
+      console.error('Chat error:', error);
       setIsTyping(false);
-
-      // Update markdown content with a sample response based on the message
-      // In a real application, this would come from the AI's response
-      const newMarkdownContent = `# Rental Listing Details
-
-## Property Overview
-${
-  message.includes("house")
-    ? "- Type: House"
-    : message.includes("apartment")
-    ? "- Type: Apartment"
-    : "- Type: Property"
-}
-- Location: ${
-        message.includes("location")
-          ? message.split("location")[1].split(" ")[1] || "City Center"
-          : "City Center"
-      }
-- Price: $${Math.floor(Math.random() * 1000) + 1000}/month
-
-## Features
-- Bedrooms: ${Math.floor(Math.random() * 3) + 1}
-- Bathrooms: ${Math.floor(Math.random() * 2) + 1}
-- Square Footage: ${Math.floor(Math.random() * 500) + 700} sq ft
-
-## Description
-${
-  message ||
-  "A beautiful property available for rent. Contact for more details."
-}
-
-## Amenities
-- WiFi
-- Parking
-- Laundry
-- Air Conditioning
-
-\`\`\`
-Available from: ${new Date().toLocaleDateString()}
-\`\`\`
-
-![Property Image](https://source.unsplash.com/random/800x600/?apartment)
-`;
-
-      setMarkdownContent(newMarkdownContent);
-    }, 1500);
+    }
   };
 
   return (

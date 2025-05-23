@@ -10,7 +10,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
     const { user } = useAuth();
     const location = useLocation();
-    const isAuthPage = location.pathname === '/signin' || location.pathname === '/signup';
+    const isAuthPage = location.pathname === '/signin' || location.pathname === '/signup' || location.pathname === '/ai-assistant';
 
     if (isAuthPage) {
         return (
