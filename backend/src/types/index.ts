@@ -19,6 +19,20 @@ export interface ChatRequest {
   history?: Message[];
 }
 
+// User types
+export interface User {
+  id?: string;
+  name: string;
+  email: string;
+  profilePicture?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface UserRequest {
+  user: User;
+}
+
 // Response types
 export interface UploadResponse {
   success: boolean;
@@ -29,5 +43,23 @@ export interface UploadResponse {
 export interface ChatResponse {
   success: boolean;
   message?: string;
+  error?: string;
+}
+
+export interface UserResponse {
+  success: boolean;
+  message?: string;
+  user?: User;
+  error?: string;
+}
+
+export interface HealthCheckResponse {
+  success: boolean;
+  status: 'ok' | 'error';
+  message: string;
+  timestamp: string;
+  database?: string;
+  version?: string;
+  environment?: string;
   error?: string;
 }

@@ -3,7 +3,9 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import chatRoutes from './routes/chatRoutes';
 import uploadRoutes from './routes/uploadRoutes';
+import userRoutes from './routes/userRoutes';
 import path from 'path';
+import { healthCheck } from './controllers/userController';
 
 // Load environment variables
 dotenv.config();
@@ -23,6 +25,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 // Routes
 app.use('/api', chatRoutes);
 app.use('/api', uploadRoutes);
+app.use('/api', userRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
