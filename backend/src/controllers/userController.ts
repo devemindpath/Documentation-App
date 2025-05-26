@@ -2,6 +2,9 @@ import { Request, Response } from 'express';
 import { User, UserResponse, HealthCheckResponse } from '../types';
 import { supabase } from '../config/supabase';
 
+// Add this constant at the top of the file after imports
+const USERS_TABLE = 'users';
+
 /**
  * Add user data after sign-in
  * @param req Request object containing user data
@@ -12,7 +15,7 @@ export const addUserData = async (req: Request, res: Response): Promise<void> =>
     // Extract user data from request body
     const userData: User = req.body;
     
-    if (!userData || !userData.email || !userData.name) {
+    if (!userData || !userData.email || !userData.name || !userData.userId) {
       res.status(400).json({
         success: false,
         error: 'User data is required with at least name and email',
@@ -30,8 +33,8 @@ export const addUserData = async (req: Request, res: Response): Promise<void> =>
     
     // Check if user already exists in the database
     const { data: existingUser, error: fetchError } = await supabase
-      .from('users')
-      .select('id, email')
+      .from(USERS_TABLE)
+      .select('id, email, userId')
       .eq('email', userData.email)
       .single();
     
@@ -44,13 +47,13 @@ export const addUserData = async (req: Request, res: Response): Promise<void> =>
     if (existingUser) {
       // Update existing user
       const { data, error } = await supabase
-        .from('users')
+        .from(USERS_TABLE)
         .update({
           name: userData.name,
           profilePicture: userData.profilePicture,
           updatedAt: now
         })
-        .eq('id', existingUser.id)
+        .eq('userId', existingUser.userId)
         .select()
         .single();
       
@@ -62,7 +65,7 @@ export const addUserData = async (req: Request, res: Response): Promise<void> =>
     } else {
       // Insert new user
       const { data, error } = await supabase
-        .from('users')
+        .from(USERS_TABLE)
         .insert([userWithTimestamps])
         .select()
         .single();
@@ -110,7 +113,7 @@ export const getUserByEmail = async (req: Request, res: Response): Promise<void>
 
     // Query the database for the user
     const { data, error } = await supabase
-      .from('users')
+      .from(USERS_TABLE)
       .select('*')
       .eq('email', email)
       .single();

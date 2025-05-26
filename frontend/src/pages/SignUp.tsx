@@ -20,7 +20,29 @@ export default function SignUp() {
     setLoading(true)
 
     try {
-      await signUp(email, password)
+      // First, sign up with Supabase
+     const {user}= await signUp(email, password)
+     const userId = user?.id
+     const url = "http://localhost:3000/api"
+      
+      // Then, store user data in our backend
+      const response = await fetch(`${url}/user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },  
+        body: JSON.stringify({
+          name: username,
+          email: email,
+          userId: userId,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to store user data');
+      }
+
       setEmailSent(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during sign up')
