@@ -14,8 +14,9 @@ export const addUserData = async (req: Request, res: Response): Promise<void> =>
   try {
     // Extract user data from request body
     const userData: User = req.body;
+    console.log("userData", userData);
     
-    if (!userData || !userData.email || !userData.name || !userData.userId) {
+    if (!userData || !userData.email || !userData.name || !userData.user_id) {
       res.status(400).json({
         success: false,
         error: 'User data is required with at least name and email',
@@ -34,7 +35,7 @@ export const addUserData = async (req: Request, res: Response): Promise<void> =>
     // Check if user already exists in the database
     const { data: existingUser, error: fetchError } = await supabase
       .from(USERS_TABLE)
-      .select('id, email, userId')
+      .select('email, user_id')
       .eq('email', userData.email)
       .single();
     
@@ -53,7 +54,7 @@ export const addUserData = async (req: Request, res: Response): Promise<void> =>
           profilePicture: userData.profilePicture,
           updatedAt: now
         })
-        .eq('userId', existingUser.userId)
+        .eq('user_id', existingUser.user_id)
         .select()
         .single();
       

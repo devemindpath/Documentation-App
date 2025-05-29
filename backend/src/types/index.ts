@@ -21,7 +21,7 @@ export interface ChatRequest {
 
 // User types
 export interface User {
-  userId?: string;
+  user_id?: string;
   name: string;
   email: string;
   profilePicture?: string;
