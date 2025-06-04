@@ -32,6 +32,7 @@ const AIAssistant: React.FC = () => {
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const [markdownContent, setMarkdownContent] = useState<string>(blogPost);
   const [activeView, setActiveView] = useState<"chat" | "preview">("chat");
+  const eventSourceRef = useRef<EventSource | null>(null);
 
   // Scroll to bottom of messages
   const scrollToBottom = () => {
@@ -55,6 +56,15 @@ const AIAssistant: React.FC = () => {
       chatContainer.addEventListener("scroll", handleScroll);
       return () => chatContainer.removeEventListener("scroll", handleScroll);
     }
+  }, []);
+
+  // Cleanup EventSource on component unmount
+  useEffect(() => {
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
+    };
   }, []);
 
   // Handle file selection
@@ -109,10 +119,13 @@ const AIAssistant: React.FC = () => {
     e.preventDefault();
     if (!message.trim() && selectedImages.length === 0) return;
 
+    const currentMessage = message; // Store current message before clearing
+    const currentImages = [...uploadedImageUrls]; // Store current images
+
     // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
-      text: message,
+      text: currentMessage,
       sender: "user",
       timestamp: new Date(),
       images: selectedImages.length > 0 ? [...selectedImages] : undefined,
@@ -128,16 +141,46 @@ const AIAssistant: React.FC = () => {
     try {
       // Prepare query parameters
       const params = new URLSearchParams({
-        message: message,
-        images: JSON.stringify(uploadedImageUrls),
+        message: currentMessage,
+        images: JSON.stringify(currentImages),
         history: JSON.stringify(messages),
       });
 
+      // Close any existing EventSource
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
+
       // Create EventSource for streaming
-      const eventSource = new EventSource(`/api/chat?${params.toString()}`);
+      const eventSource = new EventSource(`http://localhost:3000/api/chat?${params.toString()}`);
+      eventSourceRef.current = eventSource;
       let assistantResponse = "";
 
+      // Add connection timeout
+      const connectionTimeout = setTimeout(() => {
+        console.error('Connection timeout');
+        eventSource.close();
+        setIsTyping(false);
+        // Add error message
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: Date.now().toString(),
+            text: "Sorry, I'm having trouble connecting to the server. Please try again.",
+            sender: "assistant",
+            timestamp: new Date(),
+          },
+        ]);
+      }, 30000); // 30 second timeout
+
+      eventSource.onopen = () => {
+        console.log('SSE connection opened');
+        clearTimeout(connectionTimeout);
+      };
+
       eventSource.onmessage = (event) => {
+        clearTimeout(connectionTimeout);
+        
         if (event.data === "[DONE]") {
           eventSource.close();
           setIsTyping(false);
@@ -150,6 +193,16 @@ const AIAssistant: React.FC = () => {
             console.error('Chat error:', data.error);
             eventSource.close();
             setIsTyping(false);
+            // Add error message
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: Date.now().toString(),
+                text: `Error: ${data.error}`,
+                sender: "assistant",
+                timestamp: new Date(),
+              },
+            ]);
             return;
           }
 
@@ -157,7 +210,7 @@ const AIAssistant: React.FC = () => {
             assistantResponse += data.content;
             setMessages((prev) => {
               const lastMessage = prev[prev.length - 1];
-              if (lastMessage.sender === "assistant") {
+              if (lastMessage.sender === "assistant" && lastMessage.text !== `Error: ${data.error}`) {
                 return [
                   ...prev.slice(0, -1),
                   { ...lastMessage, text: assistantResponse },
@@ -182,12 +235,47 @@ const AIAssistant: React.FC = () => {
 
       eventSource.onerror = (error) => {
         console.error('SSE error:', error);
+        clearTimeout(connectionTimeout);
         eventSource.close();
         setIsTyping(false);
+        
+        // Add more specific error handling
+        if (eventSource.readyState === EventSource.CONNECTING) {
+          console.error('Failed to connect to server');
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now().toString(),
+              text: "Unable to connect to the server. Please check if the backend is running on port 3000.",
+              sender: "assistant",
+              timestamp: new Date(),
+            },
+          ]);
+        } else if (eventSource.readyState === EventSource.CLOSED) {
+          console.error('Connection was closed');
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now().toString(),
+              text: "Connection was lost. Please try again.",
+              sender: "assistant",
+              timestamp: new Date(),
+            },
+          ]);
+        }
       };
     } catch (error) {
       console.error('Chat error:', error);
       setIsTyping(false);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          text: "An unexpected error occurred. Please try again.",
+          sender: "assistant",
+          timestamp: new Date(),
+        },
+      ]);
     }
   };
 
