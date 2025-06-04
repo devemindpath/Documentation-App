@@ -82,6 +82,7 @@ Use the \`console.log()\` function to log messages to the console.
 `
 
 export const streamChat = async (req: Request, res: Response): Promise<void> => {
+  console.log("streamChat here");
   try {
     // Parse query parameters
     const message = req.query.message as string;
@@ -151,7 +152,7 @@ export const streamChat = async (req: Request, res: Response): Promise<void> => 
     const words = mockResponse.split(' ');
     for (let i = 0; i < words.length; i++) {
       const chunk = words[i] + (i < words.length - 1 ? ' ' : '');
-      res.write(`data: ${JSON.stringify({ content: chunk })}\n\n`);
+      res.write(`data: ${JSON.stringify({type: "markdown", content: chunk })}\n\n`);
       // Small delay to simulate streaming
       await new Promise(resolve => setTimeout(resolve, 50));
     }

@@ -180,7 +180,7 @@ const AIAssistant: React.FC = () => {
 
       eventSource.onmessage = (event) => {
         clearTimeout(connectionTimeout);
-        
+        console.log("event.data", JSON.parse(event.data));
         if (event.data === "[DONE]") {
           eventSource.close();
           setIsTyping(false);
@@ -207,26 +207,30 @@ const AIAssistant: React.FC = () => {
           }
 
           if (data.content) {
-            assistantResponse += data.content;
-            setMessages((prev) => {
-              const lastMessage = prev[prev.length - 1];
-              if (lastMessage.sender === "assistant" && lastMessage.text !== `Error: ${data.error}`) {
-                return [
-                  ...prev.slice(0, -1),
-                  { ...lastMessage, text: assistantResponse },
-                ];
-              } else {
-                return [
-                  ...prev,
-                  {
-                    id: Date.now().toString(),
-                    text: assistantResponse,
-                    sender: "assistant",
-                    timestamp: new Date(),
-                  },
-                ];
-              }
-            });
+            if (data.type === "markdown") {
+              setMarkdownContent(prev => prev + data.content);
+            } else if (data.type === "message") {
+              assistantResponse += data.content;
+              setMessages((prev) => {
+                const lastMessage = prev[prev.length - 1];
+                if (lastMessage.sender === "assistant" && lastMessage.text !== `Error: ${data.error}`) {
+                  return [
+                    ...prev.slice(0, -1),
+                    { ...lastMessage, text: assistantResponse },
+                  ];
+                } else {
+                  return [
+                    ...prev,
+                    {
+                      id: Date.now().toString(),
+                      text: assistantResponse,
+                      sender: "assistant",
+                      timestamp: new Date(),
+                    },
+                  ];
+                }
+              });
+            }
           }
         } catch (error) {
           console.error('Error parsing SSE data:', error);
