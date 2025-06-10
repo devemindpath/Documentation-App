@@ -26,6 +26,8 @@ const AIAssistant: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [publishError, setPublishError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -280,6 +282,38 @@ const AIAssistant: React.FC = () => {
           timestamp: new Date(),
         },
       ]);
+    }
+  };
+
+  const handlePublish = async () => {
+    try {
+      setIsPublishing(true);
+      setPublishError(null);
+
+      const response = await fetch('http://localhost:3000/api/publish-document', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: 'Document ' + new Date().toLocaleDateString(),
+          content: markdownContent,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to publish document');
+      }
+
+      // Show success message
+      alert('Document published successfully!');
+    } catch (error) {
+      console.error('Error publishing document:', error);
+      setPublishError(error instanceof Error ? error.message : 'Failed to publish document');
+    } finally {
+      setIsPublishing(false);
     }
   };
 
@@ -636,9 +670,7 @@ const AIAssistant: React.FC = () => {
                 <button
                   className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-lg transition-colors duration-300 flex items-center"
                   onClick={() => {
-                    // Copy to clipboard functionality
                     navigator.clipboard.writeText(markdownContent);
-                    // You could add a toast notification here
                   }}
                 >
                   <svg
@@ -661,7 +693,6 @@ const AIAssistant: React.FC = () => {
                 <button
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-300 flex items-center"
                   onClick={() => {
-                    // Download functionality
                     const blob = new Blob([markdownContent], {
                       type: "text/markdown",
                     });
@@ -691,8 +722,39 @@ const AIAssistant: React.FC = () => {
                   </svg>
                   Download
                 </button>
+
+                <button
+                  className={`px-4 py-2 ${
+                    isPublishing 
+                      ? 'bg-gray-500 cursor-not-allowed' 
+                      : 'bg-green-600 hover:bg-green-700'
+                  } text-white rounded-lg transition-colors duration-300 flex items-center`}
+                  onClick={handlePublish}
+                  disabled={isPublishing}
+                >
+                  <svg
+                    className="w-5 h-5 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  {isPublishing ? 'Publishing...' : 'Publish Document'}
+                </button>
               </div>
             </div>
+            {publishError && (
+              <div className="mt-2 text-red-500 text-sm text-center">
+                {publishError}
+              </div>
+            )}
           </div>
         </div>
       </div>
