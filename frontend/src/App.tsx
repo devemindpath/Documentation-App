@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import AIAssistant from "./pages/AIAssistant";
 import MarkdownDemo from "./pages/MarkdownDemo";
 import Blog from "./pages/Blog";
+import BlogDetail from "./pages/BlogDetail";
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:id" element={<BlogDetail />} />
           {/* Protected routes */}
           <Route
             path="/dashboard"

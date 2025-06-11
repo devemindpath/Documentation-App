@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import MarkdownPreview from "../components/MarkdownPreview";
 import "../styles/aiAssistant.css";
 import { blogPost } from "../components/markdownText";
+import { useAuth } from "../hooks/useAuth";
 
 // Define message type
 interface Message {
@@ -35,6 +36,8 @@ const AIAssistant: React.FC = () => {
   const [markdownContent, setMarkdownContent] = useState<string>(blogPost);
   const [activeView, setActiveView] = useState<"chat" | "preview">("chat");
   const eventSourceRef = useRef<EventSource | null>(null);
+
+  const { user } = useAuth();
 
   // Scroll to bottom of messages
   const scrollToBottom = () => {
@@ -76,12 +79,12 @@ const AIAssistant: React.FC = () => {
 
     const formData = new FormData();
     Array.from(files).forEach((file) => {
-      formData.append('images', file);
+      formData.append("images", file);
     });
 
     try {
-      const response = await fetch('/api/upload', {
-        method: 'POST',
+      const response = await fetch("/api/upload", {
+        method: "POST",
         body: formData,
       });
 
@@ -90,10 +93,10 @@ const AIAssistant: React.FC = () => {
         setUploadedImageUrls(data.urls);
         setSelectedImages(data.urls);
       } else {
-        console.error('Upload failed:', data.error);
+        console.error("Upload failed:", data.error);
       }
     } catch (error) {
-      console.error('Upload error:', error);
+      console.error("Upload error:", error);
     }
   };
 
@@ -154,13 +157,15 @@ const AIAssistant: React.FC = () => {
       }
 
       // Create EventSource for streaming
-      const eventSource = new EventSource(`http://localhost:3000/api/chat?${params.toString()}`);
+      const eventSource = new EventSource(
+        `http://localhost:3000/api/chat?${params.toString()}`
+      );
       eventSourceRef.current = eventSource;
       let assistantResponse = "";
 
       // Add connection timeout
       const connectionTimeout = setTimeout(() => {
-        console.error('Connection timeout');
+        console.error("Connection timeout");
         eventSource.close();
         setIsTyping(false);
         // Add error message
@@ -176,7 +181,7 @@ const AIAssistant: React.FC = () => {
       }, 30000); // 30 second timeout
 
       eventSource.onopen = () => {
-        console.log('SSE connection opened');
+        console.log("SSE connection opened");
         clearTimeout(connectionTimeout);
       };
 
@@ -192,7 +197,7 @@ const AIAssistant: React.FC = () => {
         try {
           const data = JSON.parse(event.data);
           if (data.error) {
-            console.error('Chat error:', data.error);
+            console.error("Chat error:", data.error);
             eventSource.close();
             setIsTyping(false);
             // Add error message
@@ -210,12 +215,15 @@ const AIAssistant: React.FC = () => {
 
           if (data.content) {
             if (data.type === "markdown") {
-              setMarkdownContent(prev => prev + data.content);
+              setMarkdownContent((prev) => prev + data.content);
             } else if (data.type === "message") {
               assistantResponse += data.content;
               setMessages((prev) => {
                 const lastMessage = prev[prev.length - 1];
-                if (lastMessage.sender === "assistant" && lastMessage.text !== `Error: ${data.error}`) {
+                if (
+                  lastMessage.sender === "assistant" &&
+                  lastMessage.text !== `Error: ${data.error}`
+                ) {
                   return [
                     ...prev.slice(0, -1),
                     { ...lastMessage, text: assistantResponse },
@@ -235,19 +243,19 @@ const AIAssistant: React.FC = () => {
             }
           }
         } catch (error) {
-          console.error('Error parsing SSE data:', error);
+          console.error("Error parsing SSE data:", error);
         }
       };
 
       eventSource.onerror = (error) => {
-        console.error('SSE error:', error);
+        console.error("SSE error:", error);
         clearTimeout(connectionTimeout);
         eventSource.close();
         setIsTyping(false);
-        
+
         // Add more specific error handling
         if (eventSource.readyState === EventSource.CONNECTING) {
-          console.error('Failed to connect to server');
+          console.error("Failed to connect to server");
           setMessages((prev) => [
             ...prev,
             {
@@ -258,7 +266,7 @@ const AIAssistant: React.FC = () => {
             },
           ]);
         } else if (eventSource.readyState === EventSource.CLOSED) {
-          console.error('Connection was closed');
+          console.error("Connection was closed");
           setMessages((prev) => [
             ...prev,
             {
@@ -271,7 +279,7 @@ const AIAssistant: React.FC = () => {
         }
       };
     } catch (error) {
-      console.error('Chat error:', error);
+      console.error("Chat error:", error);
       setIsTyping(false);
       setMessages((prev) => [
         ...prev,
@@ -290,28 +298,35 @@ const AIAssistant: React.FC = () => {
       setIsPublishing(true);
       setPublishError(null);
 
-      const response = await fetch('http://localhost:3000/api/publish-document', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: 'Document ' + new Date().toLocaleDateString(),
-          content: markdownContent,
-        }),
-      });
+      const response = await fetch(
+        "http://localhost:3000/api/publish-document",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: "Document " + new Date().toLocaleDateString(),
+            content: markdownContent,
+            user_id: user?.id,
+            author_name: "test",
+          }),
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to publish document');
+        throw new Error(data.error || "Failed to publish document");
       }
 
       // Show success message
-      alert('Document published successfully!');
+      alert("Document published successfully!");
     } catch (error) {
-      console.error('Error publishing document:', error);
-      setPublishError(error instanceof Error ? error.message : 'Failed to publish document');
+      console.error("Error publishing document:", error);
+      setPublishError(
+        error instanceof Error ? error.message : "Failed to publish document"
+      );
     } finally {
       setIsPublishing(false);
     }
@@ -725,9 +740,9 @@ const AIAssistant: React.FC = () => {
 
                 <button
                   className={`px-4 py-2 ${
-                    isPublishing 
-                      ? 'bg-gray-500 cursor-not-allowed' 
-                      : 'bg-green-600 hover:bg-green-700'
+                    isPublishing
+                      ? "bg-gray-500 cursor-not-allowed"
+                      : "bg-green-600 hover:bg-green-700"
                   } text-white rounded-lg transition-colors duration-300 flex items-center`}
                   onClick={handlePublish}
                   disabled={isPublishing}
@@ -746,7 +761,7 @@ const AIAssistant: React.FC = () => {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  {isPublishing ? 'Publishing...' : 'Publish Document'}
+                  {isPublishing ? "Publishing..." : "Publish Document"}
                 </button>
               </div>
             </div>

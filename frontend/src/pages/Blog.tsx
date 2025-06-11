@@ -1,15 +1,14 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import BlogCard from '../components/BlogCard';
+import { useState, useEffect } from "react";
+import BlogCard from "../components/BlogCard";
 
 interface BlogPost {
   id: string;
   title: string;
-  excerpt: string;
+  excerpt?: string;
   content: string;
-  author: string;
-  createdAt: string;
-  imageUrl?: string;
+  author?: string;
+  created_at: string;
+  image_url?: string;
 }
 
 export default function Blog() {
@@ -20,14 +19,14 @@ export default function Blog() {
   useEffect(() => {
     const fetchBlogPosts = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/blogs');
+        const response = await fetch("http://localhost:3000/api/blogs");
         if (!response.ok) {
-          throw new Error('Failed to fetch blog posts');
+          throw new Error("Failed to fetch blog posts");
         }
         const data = await response.json();
         setPosts(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
         setLoading(false);
       }
@@ -62,4 +61,4 @@ export default function Blog() {
       </div>
     </div>
   );
-} 
+}
