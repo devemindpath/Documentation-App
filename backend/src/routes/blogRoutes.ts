@@ -1,5 +1,7 @@
 import express from 'express';
-import { getAllBlogs, getBlogById } from '../controllers/blogController';
+import { getAllBlogs, getBlogById, getUserBlogs } from '../controllers/blogController';
+import { authenticateUser } from '../middleware/auth';
+
 
 const router = express.Router();
 
@@ -8,6 +10,6 @@ router.get('/blogs', getAllBlogs);
 router.get('/blogs/:id', getBlogById);
 
 // Protected routes
-// router.post('/', createBlog);
+router.get('/blogs/user/me', authenticateUser, getUserBlogs);
 
 export default router; 

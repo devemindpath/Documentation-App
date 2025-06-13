@@ -1,9 +1,63 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
+
+interface Blog {
+  id: string;
+  title: string;
+  content: string;
+  user_id: string;
+  author_name: string;
+  created_at: string;
+  language?: string;
+  views?: number;
+  reactions?: number;
+  comments?: number;
+}
 
 const Dashboard: React.FC = () => {
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Dummy stats for illustration
+  const totalReactions = blogs.reduce((sum, b) => sum + (b.reactions || 0), 0);
+  const totalComments = blogs.reduce((sum, b) => sum + (b.comments || 0), 0);
+  const totalViews = blogs.reduce((sum, b) => sum + (b.views || 0), 0);
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+
+        const response = await fetch('http://localhost:3000/api/blogs/user/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch blogs');
+        }
+
+        const data = await response.json();
+        setBlogs(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch blogs');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogs();
+  }, []);
+
   return (
-    <div className="flex ">
+    <div className="flex min-h-screen bg-gray-50 text-gray-900">
       {/* Sidebar */}
       <aside className="w-64 bg-gray-800 text-white h-screen fixed">
         <div className="p-4 border-b border-gray-700">
@@ -11,79 +65,9 @@ const Dashboard: React.FC = () => {
         </div>
         <nav className="p-4">
           <ul>
-            <li className="mb-3">
-              <a
-                href="#"
-                className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors"
-              >
-                <svg
-                  className="w-5 h-5 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                  ></path>
-                </svg>
-                Home
-              </a>
-            </li>
-            <li className="mb-3">
-              <a
-                href="#"
-                className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors"
-              >
-                <svg
-                  className="w-5 h-5 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  ></path>
-                </svg>
-                Documents
-              </a>
-            </li>
-
-            <li className="mb-3">
-              <a
-                href="/blog"
-                className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors"
-              >
-                <svg
-                  className="w-5 h-5 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                  ></path>
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  ></path>
-                </svg>
-                Blogs
-              </a>
-            </li>
+            <li className="mb-3"><a href="#" className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors">Home</a></li>
+            <li className="mb-3"><a href="#" className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors">Documents</a></li>
+            <li className="mb-3"><a href="/blog" className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors">Blogs</a></li>
           </ul>
         </nav>
       </aside>
@@ -92,10 +76,10 @@ const Dashboard: React.FC = () => {
       <div className="flex-1 ml-64">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">My Documents</h1>
+            <h1 className="text-2xl font-bold">My Blogs</h1>
             <div className="flex space-x-3">
-              <Link
-                to="/ai-assistant"
+              <a
+                href="/ai-assistant"
                 className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-2 rounded-md flex items-center transition-colors"
               >
                 <svg
@@ -113,9 +97,9 @@ const Dashboard: React.FC = () => {
                   ></path>
                 </svg>
                 AI Assistant
-              </Link>
-              <Link
-                to="/markdown-demo"
+              </a>
+              <a
+                href="/markdown-demo"
                 className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-4 py-2 rounded-md flex items-center transition-colors"
               >
                 <svg
@@ -132,31 +116,88 @@ const Dashboard: React.FC = () => {
                     d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
                   ></path>
                 </svg>
-                Markdown Preview
-              </Link>
+                Create Doc
+              </a>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            {/* Dashboard content */}
-            <div className="text-gray-500 text-center py-8">
-              <svg
-                className="w-16 h-16 mx-auto text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                ></path>
-              </svg>
-              <h3 className="mt-2 text-xl font-medium">No documents yet</h3>
-              <p className="mt-1">Create your first document to get started</p>
+          {/* Stats */}
+          <div className="flex space-x-6 mb-8">
+            <div className="bg-white rounded-lg p-6 flex-1 text-center shadow">
+              <div className="text-2xl font-bold">{totalReactions}</div>
+              <div className="text-gray-500">Total post reactions</div>
             </div>
+            <div className="bg-white rounded-lg p-6 flex-1 text-center shadow">
+              <div className="text-2xl font-bold">{totalComments}</div>
+              <div className="text-gray-500">Total post comments</div>
+            </div>
+            <div className="bg-white rounded-lg p-6 flex-1 text-center shadow">
+              <div className="text-2xl font-bold">{totalViews}</div>
+              <div className="text-gray-500">Total post views</div>
+            </div>
+          </div>
+
+          {/* Blog List */}
+          <div className="bg-white rounded-lg p-6 shadow">
+            <h3 className="text-xl font-bold mb-4">Posts</h3>
+            {loading ? (
+              <div className="flex justify-center items-center py-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              </div>
+            ) : error ? (
+              <div className="text-red-600 text-center py-8">
+                Error: {error}
+              </div>
+            ) : blogs.length === 0 ? (
+              <div className="text-gray-500 text-center py-8">
+                <svg
+                  className="w-16 h-16 mx-auto text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  ></path>
+                </svg>
+                <h3 className="mt-2 text-xl font-medium">No blogs yet</h3>
+                <p className="mt-1">Create your first blog to get started</p>
+              </div>
+            ) : (
+              <table className="w-full text-left">
+                <thead>
+                  <tr>
+                    <th className="py-2">Title</th>
+                    <th className="py-2">Published</th>
+                    <th className="py-2">Language</th>
+                    <th className="py-2">Views</th>
+                    <th className="py-2">Reactions</th>
+                    <th className="py-2">Comments</th>
+                    <th className="py-2">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {blogs.map(blog => (
+                    <tr key={blog.id} className="border-t border-gray-200 hover:bg-gray-50">
+                      <td className="py-2 text-blue-600 hover:underline cursor-pointer">{blog.title}</td>
+                      <td className="py-2">{new Date(blog.created_at).toLocaleDateString()}</td>
+                      <td className="py-2">{blog.language || "English"}</td>
+                      <td className="py-2">{blog.views || 0}</td>
+                      <td className="py-2">{blog.reactions || 0}</td>
+                      <td className="py-2">{blog.comments || 0}</td>
+                      <td className="py-2">
+                        <button className="text-blue-600 hover:underline mr-2">Manage</button>
+                        <button className="text-blue-600 hover:underline">Edit</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       </div>
