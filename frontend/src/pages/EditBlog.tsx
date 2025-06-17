@@ -134,7 +134,10 @@ const EditBlog: React.FC = () => {
 
       {/* Editor and Preview */}
       <div className="flex-1 overflow-hidden p-6">
-        <div className="h-full bg-gray-800 rounded-lg shadow-lg" data-color-mode="dark">
+        <div
+          className="h-full bg-gray-800 rounded-lg shadow-lg"
+          data-color-mode="dark"
+        >
           <MDEditor
             value={content}
             onChange={(value) => setContent(value || "")}
