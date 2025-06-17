@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
+import { Link } from "react-router-dom";
 
 interface Blog {
   id: string;
@@ -27,27 +28,32 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         const token = session?.access_token;
 
         if (!token) {
-          throw new Error('No authentication token found');
+          throw new Error("No authentication token found");
         }
 
-        const response = await fetch('http://localhost:3000/api/blogs/user/me', {
-          headers: {
-            'Authorization': `Bearer ${token}`
+        const response = await fetch(
+          "http://localhost:3000/api/blogs/user/me",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
-        });
+        );
 
         if (!response.ok) {
-          throw new Error('Failed to fetch blogs');
+          throw new Error("Failed to fetch blogs");
         }
 
         const data = await response.json();
         setBlogs(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch blogs');
+        setError(err instanceof Error ? err.message : "Failed to fetch blogs");
       } finally {
         setLoading(false);
       }
@@ -65,9 +71,30 @@ const Dashboard: React.FC = () => {
         </div>
         <nav className="p-4">
           <ul>
-            <li className="mb-3"><a href="#" className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors">Home</a></li>
-            <li className="mb-3"><a href="#" className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors">Documents</a></li>
-            <li className="mb-3"><a href="/blog" className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors">Blogs</a></li>
+            <li className="mb-3">
+              <a
+                href="#"
+                className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors"
+              >
+                Home
+              </a>
+            </li>
+            <li className="mb-3">
+              <a
+                href="#"
+                className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors"
+              >
+                Documents
+              </a>
+            </li>
+            <li className="mb-3">
+              <a
+                href="/blog"
+                className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors"
+              >
+                Blogs
+              </a>
+            </li>
           </ul>
         </nav>
       </aside>
@@ -181,17 +208,36 @@ const Dashboard: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {blogs.map(blog => (
-                    <tr key={blog.id} className="border-t border-gray-200 hover:bg-gray-50">
-                      <td className="py-2 text-blue-600 hover:underline cursor-pointer">{blog.title}</td>
-                      <td className="py-2">{new Date(blog.created_at).toLocaleDateString()}</td>
+                  {blogs.map((blog) => (
+                    <tr
+                      key={blog.id}
+                      className="border-t border-gray-200 hover:bg-gray-50"
+                    >
+                      <td className="py-2">
+                        <Link
+                          to={`/blog/${blog.id}`}
+                          className="text-blue-600 hover:underline"
+                        >
+                          {blog.title}
+                        </Link>
+                      </td>
+                      <td className="py-2">
+                        {new Date(blog.created_at).toLocaleDateString()}
+                      </td>
                       <td className="py-2">{blog.language || "English"}</td>
                       <td className="py-2">{blog.views || 0}</td>
                       <td className="py-2">{blog.reactions || 0}</td>
                       <td className="py-2">{blog.comments || 0}</td>
                       <td className="py-2">
-                        <button className="text-blue-600 hover:underline mr-2">Manage</button>
-                        <button className="text-blue-600 hover:underline">Edit</button>
+                        <button className="text-blue-600 hover:underline mr-2">
+                          Manage
+                        </button>
+                        <Link
+                          to={`/edit-blog/${blog.id}`}
+                          className="text-blue-600 hover:underline"
+                        >
+                          Edit
+                        </Link>
                       </td>
                     </tr>
                   ))}

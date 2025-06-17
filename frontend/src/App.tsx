@@ -14,6 +14,7 @@ import AIAssistant from "./pages/AIAssistant";
 import MarkdownDemo from "./pages/MarkdownDemo";
 import Blog from "./pages/Blog";
 import BlogDetail from "./pages/BlogDetail";
+import EditBlog from "./pages/EditBlog";
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -62,6 +63,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <MarkdownDemo />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/edit-blog/:id"
+            element={
+              <ProtectedRoute>
+                <EditBlog />
               </ProtectedRoute>
             }
           />
