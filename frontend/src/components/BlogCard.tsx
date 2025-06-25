@@ -5,7 +5,7 @@ interface BlogPost {
   title: string;
   excerpt?: string;
   content: string;
-  author?: string;
+  author_name?: string;
   created_at: string;
   image_url?: string;
 }
@@ -40,7 +40,7 @@ export default function BlogCard({ post }: BlogCardProps) {
           
           <p className="text-gray-600 mb-4 line-clamp-3">{post.excerpt || post.content.substring(0, 150) + '...'}</p>
           <div className="flex justify-between items-center text-sm text-gray-500">
-            <span>{post.author || "Anonymous"}</span>
+            <span>{post.author_name|| "Anonymous"}</span>
             <span>{formattedDate}</span>
           </div>
         </div>

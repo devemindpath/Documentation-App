@@ -4,18 +4,33 @@ import type { User } from "../lib/supabase";
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
+  const [userInfo, setUserInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  const fetchUserInfo = async (email: string) => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/user?email=${email}`);
+      if (!res.ok) throw new Error("Failed to fetch user info");
+      const data = await res.json();
+      setUserInfo(data);
+    } catch (err) {
+      setUserInfo(null);
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
+        console.log('user',session?.user)
         setUser({
           id: session.user.id,
           email: session.user.email!,
           role: session.user.user_metadata.role || "creator",
           created_at: session.user.created_at,
         });
+        fetchUserInfo(session.user.email!);
       }
       setLoading(false);
     });
@@ -31,8 +46,10 @@ export function useAuth() {
           role: session.user.user_metadata.role || "creator",
           created_at: session.user.created_at,
         });
+        fetchUserInfo(session.user.email!);
       } else {
         setUser(null);
+        setUserInfo(null);
       }
       setLoading(false);
     });
@@ -81,6 +98,7 @@ export function useAuth() {
 
   return {
     user,
+    userInfo,
     loading,
     signIn,
     signUp,

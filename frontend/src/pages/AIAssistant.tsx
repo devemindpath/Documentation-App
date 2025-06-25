@@ -309,7 +309,7 @@ const AIAssistant: React.FC = () => {
             title: "Document " + new Date().toLocaleDateString(),
             content: markdownContent,
             user_id: user?.id,
-            author_name: "test",
+            author_name: 'test',
           }),
         }
       );
