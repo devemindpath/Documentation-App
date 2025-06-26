@@ -15,6 +15,7 @@ import MarkdownDemo from "./pages/MarkdownDemo";
 import Blog from "./pages/Blog";
 import BlogDetail from "./pages/BlogDetail";
 import EditBlog from "./pages/EditBlog";
+import Profile from "./pages/Profile";
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -71,6 +72,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <EditBlog />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             }
           />

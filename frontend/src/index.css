@@ -25,3 +25,14 @@
     @apply bg-gray-200 text-gray-800 hover:bg-gray-300;
   }
 }
+
+/* Default avatar fallback for profile page */
+.default-avatar {
+  background: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  width: 7rem;
+  height: 7rem;
+}

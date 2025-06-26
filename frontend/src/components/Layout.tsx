@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuth } from '../hooks/useAuth';
 import Header from './Header';
 import { useLocation } from 'react-router-dom';
+import { UserProvider } from '../context/UserContext';
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -21,12 +22,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
 
     return (
-        <div className="flex flex-col h-screen bg-gray-50">
-            {user && <Header />}
-            <main className="flex-1">
-                {children}
-            </main>
-        </div>
+        <UserProvider>
+            <div className="flex flex-col h-screen bg-gray-50">
+                {user && <Header />}
+                <main className="flex-1">
+                    {children}
+                </main>
+            </div>
+        </UserProvider>
     );
 };
 
