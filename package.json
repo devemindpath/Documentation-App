@@ -1,0 +1,13 @@
+{
+  "name": "documentation-app-root",
+  "version": "1.0.0",
+  "description": "Root package for Documentation App",
+  "scripts": {
+    "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "build": "cd backend && npm run build && cd ../frontend && npm run build",
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm run dev\"" 
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+} 
