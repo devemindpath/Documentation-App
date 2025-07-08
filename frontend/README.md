@@ -1,6 +1,6 @@
-# Documentation App
+# Blog App
 
-A modern documentation application built with React, TypeScript, Tailwind CSS, and Supabase.
+A modern Blog application built with React, TypeScript, Tailwind CSS, and Supabase.
 
 ## Features
 

@@ -1,7 +1,7 @@
 -- Create enum for content types
 CREATE TYPE content_type AS ENUM ('text', 'image');
 
--- Create table for documentation topics
+-- Create table for Blog topics
 CREATE TABLE topics (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE topics (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create table for documentation sections
+-- Create table for Blog sections
 CREATE TABLE sections (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     topic_id UUID REFERENCES topics(id) ON DELETE CASCADE,

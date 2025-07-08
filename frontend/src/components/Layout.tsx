@@ -1,36 +1,35 @@
 import React from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import Header from './Header';
-import { useLocation } from 'react-router-dom';
+import Sidebar from './Sidebar';
 import { UserProvider } from '../context/UserContext';
 
-interface LayoutProps {
-    children: React.ReactNode;
-}
-
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC = () => {
     const { user } = useAuth();
     const location = useLocation();
-    const isAuthPage = location.pathname === '/signin' || location.pathname === '/signup' || location.pathname === '/ai-assistant';
+    const isAuthPage = location.pathname === '/signin' || location.pathname === '/signup';
 
     if (isAuthPage) {
         return (
             <div className="h-screen bg-gray-50">
-                {children}
+                <Outlet />
             </div>
         );
     }
-
     return (
         <UserProvider>
-            <div className="flex flex-col h-screen bg-gray-50">
-                {user && <Header />}
-                <main className="flex-1">
-                    {children}
-                </main>
+            <div className="flex h-screen bg-gray-50">
+                {user && <Sidebar />}
+                <div className="flex flex-col flex-1">
+                    {user && <Header />}
+                    <main className="flex-1 overflow-y-auto">
+                        <Outlet />
+                    </main>
+                </div>
             </div>
         </UserProvider>
     );
 };
 
-export default Layout; 
+export default Layout;

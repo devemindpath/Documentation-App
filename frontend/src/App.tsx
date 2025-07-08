@@ -35,14 +35,12 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <Router>
-      <Layout>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:id" element={<BlogDetail />} />
-          {/* Protected routes */}
+      <Routes>
+        {/* Auth pages without layout */}
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} />
+        {/* All other pages use layout */}
+        <Route element={<Layout />}>
           <Route
             path="/dashboard"
             element={
@@ -51,6 +49,8 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:id" element={<BlogDetail />} />
           <Route
             path="/ai-assistant"
             element={
@@ -83,7 +83,6 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          {/* Redirect root to dashboard if authenticated, otherwise to signin */}
           <Route
             path="/"
             element={
@@ -92,8 +91,8 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-        </Routes>
-      </Layout>
+        </Route>
+      </Routes>
     </Router>
   );
 }

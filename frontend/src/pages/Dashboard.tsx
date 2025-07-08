@@ -63,44 +63,10 @@ const Dashboard: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-gray-50 text-gray-900">
-      {/* Sidebar */}
-      <aside className="w-64 bg-gray-800 text-white h-screen fixed">
-        <div className="p-4 border-b border-gray-700">
-          <h2 className="text-xl font-semibold">Documentation</h2>
-        </div>
-        <nav className="p-4">
-          <ul>
-            <li className="mb-3">
-              <a
-                href="#"
-                className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors"
-              >
-                Home
-              </a>
-            </li>
-            <li className="mb-3">
-              <a
-                href="#"
-                className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors"
-              >
-                Documents
-              </a>
-            </li>
-            <li className="mb-3">
-              <a
-                href="/blog"
-                className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors"
-              >
-                Blogs
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </aside>
+    <div className="flex h-full bg-gray-50 text-gray-900">
 
       {/* Main Content */}
-      <div className="flex-1 ml-64">
+      <div className="flex-1 pl-4">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">My Blogs</h1>
@@ -125,7 +91,7 @@ const Dashboard: React.FC = () => {
                 </svg>
                 AI Assistant
               </a>
-              <a
+              {/* <a
                 href="/markdown-demo"
                 className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-4 py-2 rounded-md flex items-center transition-colors"
               >
@@ -144,7 +110,7 @@ const Dashboard: React.FC = () => {
                   ></path>
                 </svg>
                 Create Doc
-              </a>
+              </a> */}
             </div>
           </div>
 

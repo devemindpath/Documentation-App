@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
 import MarkdownPreview from "../components/MarkdownPreview";
 import "../styles/aiAssistant.css";
 import { blogPost } from "../components/markdownText";
@@ -339,42 +338,13 @@ const AIAssistant: React.FC = () => {
       <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
       <div className="absolute bottom-1/4 left-1/3 w-64 h-64 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
 
-      {/* Back to Dashboard Link */}
-      <div className="absolute top-6 left-6 z-10">
-        <Link
-          to="/dashboard"
-          className="flex items-center text-gray-300 hover:text-white transition-colors duration-300 group"
-        >
-          <svg
-            className="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform duration-300"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
-          <span className="relative">
-            Back to Dashboard
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white group-hover:w-full transition-all duration-300"></span>
-          </span>
-        </Link>
-      </div>
 
       {/* Header - Collapsible on scroll */}
       <div
         className={`sticky top-0 z-10 transition-all duration-300 ${
-          isHeaderVisible ? "py-4 opacity-100" : "py-1 opacity-0"
+          isHeaderVisible ? "opacity-100" : "opacity-0"
         }`}
       >
-        <h1 className="text-3xl md:text-4xl font-bold text-center bg-gradient-to-r from-blue-400 via-purple-400 to-pink-500 text-transparent bg-clip-text animate-gradient">
-          AI Assistant
-        </h1>
 
         {/* View Toggle for Mobile */}
         <div className="md:hidden flex justify-center mt-2">

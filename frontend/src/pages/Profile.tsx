@@ -90,7 +90,7 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50 text-gray-900">
+    <div className="flex justify-center items-center h-full bg-gray-50 text-gray-900">
       <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-xl">
         <div className="flex flex-col items-center mb-6">
           <div className="relative">

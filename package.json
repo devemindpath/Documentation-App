@@ -1,7 +1,7 @@
 {
-  "name": "documentation-app-root",
+  "name": "Blog-app-root",
   "version": "1.0.0",
-  "description": "Root package for Documentation App",
+  "description": "Root package for Blog App",
   "scripts": {
     "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install",
     "build": "cd backend && npm run build && cd ../frontend && npm run build",
