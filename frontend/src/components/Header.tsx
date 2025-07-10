@@ -37,26 +37,20 @@ const Header: React.FC = () => {
   };
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="bg-white border-b border-gray-200 shadow-sm">
+      <div className="px-6">
         <div className="flex justify-between h-16 items-center">
           <div className="flex">
-            <div className="flex-shrink-0 flex items-center">
-              <h1 className="text-xl font-bold text-blue-600">
-                Blog App
-              </h1>
-            </div>
           </div>
           {user && (
-            <div className="relative" ref={menuRef}>
+            <div className="relative flex items-center" ref={menuRef}>
               <button
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-black text-white hover:bg-[#23272F] focus:outline-none focus:ring-2 focus:ring-black font-semibold ml-auto"
                 onClick={() => setOpen((v) => !v)}
                 aria-label="User menu"
               >
-                {/* User Icon SVG */}
                 <svg
-                  className="w-6 h-6 text-gray-600"
+                  className="w-6 h-6 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -77,7 +71,7 @@ const Header: React.FC = () => {
                 </svg>
               </button>
               {open && (
-                <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                <div className="absolute top-8 right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50">
                   <button
                     className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700"
                     onClick={handleProfile}

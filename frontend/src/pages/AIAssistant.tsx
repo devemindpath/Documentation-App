@@ -332,11 +332,11 @@ const AIAssistant: React.FC = () => {
   };
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-black via-purple-950 to-black text-white overflow-hidden relative">
+    <div className="h-full flex flex-col bg-gradient-to-br from-white via-[#F3F6F9] to-[#E3E8EF] text-[#23272F] overflow-hidden relative">
       {/* Decorative Background Elements */}
-      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-      <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-      <div className="absolute bottom-1/4 left-1/3 w-64 h-64 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-[#B2DDFF] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+      <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-[#FFD600] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+      <div className="absolute bottom-1/4 left-1/3 w-64 h-64 bg-[#A7F3D0] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
 
 
       {/* Header - Collapsible on scroll */}
@@ -379,7 +379,7 @@ const AIAssistant: React.FC = () => {
         <div
           className={`${
             activeView === "chat" ? "flex" : "hidden"
-          } md:flex flex-col flex-1 md:border-r border-white/10 overflow-hidden`}
+          } md:flex flex-col flex-1 md:border-r border-gray-200 bg-white/80 overflow-hidden`}
         >
           {/* Chat Messages Container */}
           <div
@@ -387,7 +387,7 @@ const AIAssistant: React.FC = () => {
             className="flex-1 overflow-y-auto px-4 py-2 scroll-smooth"
             style={{
               scrollbarWidth: "thin",
-              scrollbarColor: "rgba(255,255,255,0.2) transparent",
+              scrollbarColor: "rgba(35,39,47,0.1) transparent",
             }}
           >
             <div className="max-w-3xl mx-auto">
@@ -399,57 +399,14 @@ const AIAssistant: React.FC = () => {
                   } mb-4 animate-fadeIn`}
                 >
                   <div
-                    className={`max-w-[80%] px-4 py-3 rounded-2xl ${
+                    className={`max-w-[80%] px-4 py-3 rounded-2xl text-base shadow ${
                       msg.sender === "user"
-                        ? "bg-blue-600/70 rounded-tr-none"
-                        : "glassmorphism backdrop-blur-md bg-white/10 border border-white/20 rounded-tl-none"
+                        ? "bg-blue-600 text-white rounded-tr-none"
+                        : "bg-gray-100 text-[#23272F] border border-gray-200 rounded-tl-none"
                     }`}
                   >
-                    {msg.text && <p className="text-white">{msg.text}</p>}
-
-                    {/* Display images if present */}
-                    {msg.images && msg.images.length > 0 && (
-                      <div
-                        className={`mt-2 ${
-                          msg.text ? "mt-3" : "mt-0"
-                        } grid grid-cols-2 gap-2`}
-                      >
-                        {msg.images.map((img, index) => (
-                          <div key={index} className="relative group">
-                            <img
-                              src={img}
-                              alt={`Attachment ${index + 1}`}
-                              className="rounded-lg w-full h-auto object-cover"
-                            />
-                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 rounded-lg flex items-center justify-center">
-                              <a
-                                href={img}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                              >
-                                <svg
-                                  className="w-8 h-8 text-white"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                  />
-                                </svg>
-                              </a>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    <p className="text-xs text-gray-300 mt-1 text-right">
+                    {msg.text && <p className="whitespace-pre-line">{msg.text}</p>}
+                    <p className={`text-xs mt-1 text-right ${msg.sender === 'user' ? 'text-white/80' : 'text-gray-500'}`}>
                       {msg.timestamp.toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
@@ -462,11 +419,11 @@ const AIAssistant: React.FC = () => {
               {/* Typing indicator */}
               {isTyping && (
                 <div className="flex justify-start mb-4">
-                  <div className="glassmorphism backdrop-blur-md bg-white/10 border border-white/20 px-4 py-3 rounded-2xl rounded-tl-none">
+                  <div className="glassmorphism backdrop-blur-md bg-gray-100 border border-gray-200 px-4 py-3 rounded-2xl rounded-tl-none">
                     <div className="flex space-x-2">
-                      <div className="typing-dot"></div>
-                      <div className="typing-dot animation-delay-200"></div>
-                      <div className="typing-dot animation-delay-400"></div>
+                      <div className="typing-dot text-gray-700 bg-gray-400!"></div>
+                      <div className="typing-dot bg-gray-400! animation-delay-200"></div>
+                      <div className="typing-dot bg-gray-400! animation-delay-400"></div>
                     </div>
                   </div>
                 </div>
@@ -478,7 +435,7 @@ const AIAssistant: React.FC = () => {
           </div>
 
           {/* Chat Input Box - Fixed at bottom */}
-          <div className="w-full px-4 py-4 border-t border-white/10 bg-black/30 backdrop-blur-md z-10">
+          <div className="w-full px-4 py-4 border-t border-gray-200 bg-white/90 backdrop-blur-md z-10">
             <div className="max-w-3xl mx-auto">
               {/* Selected Images Preview */}
               {selectedImages.length > 0 && (
@@ -526,7 +483,7 @@ const AIAssistant: React.FC = () => {
               )}
 
               <form onSubmit={handleSubmit} className="w-full">
-                <div className="relative w-full rounded-full border border-gray-600/50 shadow-lg transition-all duration-300 hover:shadow-xl focus-within:border-blue-400 focus-within:shadow-blue-400/20 group">
+                <div className="relative w-full rounded-full border border-gray-300 shadow-lg transition-all duration-300 hover:shadow-xl focus-within:border-blue-400 focus-within:shadow-blue-400/20 group bg-white">
                   {/* Hidden File Input */}
                   <input
                     type="file"
@@ -566,7 +523,7 @@ const AIAssistant: React.FC = () => {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Type a message..."
-                    className="w-full bg-transparent py-4 pl-14 pr-14 text-white placeholder-gray-400 focus:outline-none focus-ring rounded-full"
+                    className="w-full bg-transparent py-4 pl-14 pr-14 text-[#23272F] placeholder-gray-400 focus:outline-none focus-ring rounded-full"
                     aria-label="Type a message"
                   />
 
@@ -599,9 +556,8 @@ const AIAssistant: React.FC = () => {
                 </div>
 
                 {/* Hint Text */}
-                <p className="text-xs text-gray-400 mt-2 text-center">
-                  Press Enter to send • Upload multiple images with the image
-                  icon
+                <p className="text-xs text-gray-500 mt-2 text-center">
+                  Press Enter to send • Upload multiple images with the image icon
                 </p>
               </form>
             </div>
@@ -745,7 +701,7 @@ const AIAssistant: React.FC = () => {
       </div>
 
       {/* Bottom Decorative Element */}
-      <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-purple-900/20 to-transparent pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-[#F3F6F9]/40 to-transparent pointer-events-none"></div>
     </div>
   );
 };
