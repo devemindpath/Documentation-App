@@ -18,8 +18,10 @@ export function useAuth() {
       console.error(err);
     }
   };
+  console.log("above useEffect")
 
   useEffect(() => {
+    console.log("useEffect")
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useUser } from "../context/UserContext";
 
 interface ProfileForm {
@@ -13,7 +13,7 @@ const Profile: React.FC = () => {
   const [editMode, setEditMode] = useState(false);
   const [form, setForm] = useState<ProfileForm>(userInfo || {});
   const [image, setImage] = useState<string | null>(
-    userInfo?.profilePicture || null
+    userInfo?.user.profilePicture || null
   );
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -23,8 +23,18 @@ const Profile: React.FC = () => {
 
   React.useEffect(() => {
     setForm(userInfo || {});
-    setImage(userInfo?.profilePicture || null);
+    setImage(userInfo?.user.profilePicture || null);
   }, [userInfo]);
+
+  // Clear success message after 3 seconds
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        setSuccess(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
 
   // Helper function to process image data and handle base64 URLs
   const processImageData = (imageData: string | null): string | null => {
@@ -88,7 +98,7 @@ const Profile: React.FC = () => {
   const handleCancel = () => {
     setEditMode(false);
     setForm(userInfo || {});
-    setImage(userInfo?.profilePicture || null);
+    setImage(userInfo?.user.profilePicture || null);
   };
   
   const handleSave = async () => {
@@ -322,7 +332,7 @@ const Profile: React.FC = () => {
                     <input
                       type="text"
                       name="name"
-                      value={form.name || ""}
+                      value={form.name || userInfo?.user.name || ""}
                       onChange={handleChange}
                       disabled={!editMode}
                       placeholder="Enter your full name"
@@ -339,7 +349,7 @@ const Profile: React.FC = () => {
                   <div className="md:col-span-2">
                     <input
                       type="email"
-                      value={user?.email || ""}
+                      value={userInfo?.user.email || user?.email || ""}
                       disabled
                       className="w-full px-4 py-3 rounded-lg border border-input bg-muted text-muted-foreground cursor-not-allowed"
                     />
@@ -369,7 +379,7 @@ const Profile: React.FC = () => {
                   <div className="md:col-span-2">
                     <input
                       type="text"
-                      value={formatDate(user?.created_at || "")}
+                      value={formatDate(userInfo?.user.createdAt || user?.created_at || "")}
                       disabled
                       className="w-full px-4 py-3 rounded-lg border border-input bg-muted text-muted-foreground cursor-not-allowed"
                     />
@@ -384,7 +394,7 @@ const Profile: React.FC = () => {
                   <div className="md:col-span-2">
                     <input
                       type="text"
-                      value={user?.id || ""}
+                      value={userInfo?.user.user_id || user?.id || ""}
                       disabled
                       className="w-full px-4 py-3 rounded-lg border border-input bg-muted text-muted-foreground cursor-not-allowed font-mono text-sm"
                     />
